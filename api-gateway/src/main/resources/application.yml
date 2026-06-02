@@ -1,0 +1,37 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      server:
+        webflux:
+          routes:
+            - id: ms-productos-route
+              uri: http://localhost:8081
+              predicates:
+                - "Path=/api/v1/productos/**"
+                - "Path=/api/v1/categorias/**"
+                - "Path=/api/v1/marcas/**"
+
+            - id: ms-locales-route
+              uri: http://localhost:8082
+              predicates:
+                - "Path=/api/v1/locales/**"
+                - "Path=/api/v1/comunas/**"
+                - "Path=/api/v1/regiones/**"
+                - "Path=/api/v1/clientes/**"
+
+            - id: ms-ventas-route
+              uri: http://localhost:8083
+              predicates:
+                - "Path=/api/v1/ventas/**"
+                - "Path=/api/v1/pagos/**"
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info
