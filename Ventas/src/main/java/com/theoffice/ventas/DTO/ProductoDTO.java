@@ -1,4 +1,4 @@
-package producto.producto.dto;
+package com.theoffice.ventas.DTO;
 import lombok.Data;
 
 @Data

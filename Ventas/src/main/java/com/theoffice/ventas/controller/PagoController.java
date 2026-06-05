@@ -1,8 +1,8 @@
 package com.theoffice.ventas.controller;
 
-import com.theoffice.ventas.DTO.TipoPagoDTO;
-import com.theoffice.ventas.model.TipoPago;
-import com.theoffice.ventas.service.TipoPagoService;
+import com.theoffice.ventas.DTO.PagoDTO;
+import com.theoffice.ventas.model.Pago;
+import com.theoffice.ventas.service.PagoService;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,22 +15,22 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/tipos-pago")
 @Slf4j
-public class TipoPagoController {
+public class PagoController {
 
     @Autowired
-    private TipoPagoService tipoPagoService;
+    private PagoService tipoPagoService;
 
     @PostMapping
-    public ResponseEntity<TipoPagoDTO> crear(@Valid @RequestBody TipoPago tipoPago) {
+    public ResponseEntity<PagoDTO> crear(@Valid @RequestBody Pago tipoPago) {
         log.info("API REST - Creando tipo de pago: '{}'", tipoPago.getFormaPago());
-        TipoPagoDTO nuevoTipo = tipoPagoService.crear(tipoPago);
+        PagoDTO nuevoTipo = tipoPagoService.crear(tipoPago);
         return new ResponseEntity<>(nuevoTipo, HttpStatus.CREATED);
     }
 
     @GetMapping
-    public ResponseEntity<List<TipoPagoDTO>> obtenerTodos() {
+    public ResponseEntity<List<PagoDTO>> obtenerTodos() {
         log.info("API REST - Listando todos los tipos de pago activos");
-        List<TipoPagoDTO> tipos = tipoPagoService.obtenerTodos();
+        List<PagoDTO> tipos = tipoPagoService.obtenerTodos();
         
         if (tipos.isEmpty()) {
             log.info("No se encontraron tipos de pago activos");
@@ -41,16 +41,16 @@ public class TipoPagoController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<TipoPagoDTO> obtenerPorId(@PathVariable Integer id) {
+    public ResponseEntity<PagoDTO> obtenerPorId(@PathVariable Integer id) {
         log.info("API REST - Buscando tipo de pago con ID: {}", id);
-        TipoPagoDTO tipoPago = tipoPagoService.obtenerPorId(id);
+        PagoDTO tipoPago = tipoPagoService.obtenerPorId(id);
         return ResponseEntity.ok(tipoPago);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<TipoPagoDTO> actualizar(@PathVariable Integer id, @Valid @RequestBody TipoPago tipoPago) {
+    public ResponseEntity<PagoDTO> actualizar(@PathVariable Integer id, @Valid @RequestBody Pago tipoPago) {
         log.info("API REST - Actualizando tipo de pago con ID: {}", id);
-        TipoPagoDTO actualizado = tipoPagoService.actualizar(id, tipoPago);
+        PagoDTO actualizado = tipoPagoService.actualizar(id, tipoPago);
         return ResponseEntity.ok(actualizado);
     }
 
