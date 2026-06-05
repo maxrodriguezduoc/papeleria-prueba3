@@ -19,7 +19,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Entity
 @Table(name = "pagos")
-public class Pago {
+public class TipoPago {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,19 +27,19 @@ public class Pago {
 
     @ManyToOne
     @JoinColumn(name = "id_venta", nullable = false)
-    private Venta venta; // Relación con la Venta (Muchos pagos apuntan a una Venta)
+    private Venta venta; // Relación con la Venta
 
-    @ManyToOne
-    @JoinColumn(name = "id_tipo_pago", nullable = false)
-    private TipoPago tipoPago; // Efectivo, Tarjeta, Transferencia
+    @NotNull(message = "La forma de pago es obligatoria")
+    @Column(name = "forma_pago", nullable = false, length = 30)
+    private String formaPago; // Guarda: 'EFECTIVO', 'TRANSFERENCIA', etc.
 
     @ManyToOne
     @JoinColumn(name = "id_tarjeta", nullable = true)
-    private Tarjeta tarjeta; // Solo se llena si se pagó con Tarjeta
+    private Tarjeta tarjeta; // Solo se llena si formaPago es TARJETA_...
 
     @ManyToOne
     @JoinColumn(name = "id_transferencia", nullable = true)
-    private Transferencia transferencia; // Solo se llena si se pagó con Transferencia
+    private Transferencia transferencia; // Solo se llena si formaPago es TRANSFERENCIA
 
     @Column(nullable = false)
     @NotNull(message = "El monto a pagar es obligatorio")
@@ -47,5 +47,5 @@ public class Pago {
     private Integer monto;
 
     @Column(nullable = false)
-    private boolean activo;
+    private boolean activo = true;
 }
