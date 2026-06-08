@@ -18,6 +18,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import Ubicacion.Local.dto.LocalDTO;
 import Ubicacion.Local.model.Comuna;
 import Ubicacion.Local.model.Local;
+import Ubicacion.Local.model.Region;
 import Ubicacion.Local.repository.LocalRepository;
 
 @ExtendWith(MockitoExtension.class)
@@ -73,6 +74,11 @@ public class LocalServiceTest {
 
         Integer idBuscado = 1;
 
+        Region region = new Region();
+        region.setIdRegion(1);
+        region.setNombreRegion("Region Metropolitana");
+        region.setActivo(true);
+
         Comuna comuna = new Comuna();
         comuna.setIdComuna(1);
         comuna.setNombreComuna("Cerrillos");
@@ -108,7 +114,6 @@ public class LocalServiceTest {
         assertEquals(1, 
                 resultado.getComunaId(),
                 "La comuna del Local debe coincidir!");
-
         verify(localRepository, atLeastOnce())
             .findById(idBuscado);
     }
