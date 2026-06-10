@@ -85,13 +85,16 @@ public class CargoService {
 
         if (cargo.getNombreCargo() == null || cargo.getNombreCargo().trim().isEmpty()) {
             throw new RuntimeException("Nombre de cargo es obligatorio!");
+            
         }
 
         cargoExistente.setNombreCargo(cargo.getNombreCargo().trim());
 
+        Cargo actualizado = cargoRepository.save(cargoExistente);
+
         log.info("Cargo actualizado con exito!");
 
-        return convertirADTO(cargoExistente);
+        return convertirADTO(actualizado);
     }
 
     private CargoDTO convertirADTO(Cargo cargo) {
