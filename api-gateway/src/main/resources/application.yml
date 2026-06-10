@@ -7,31 +7,25 @@ spring:
   cloud:
     gateway:
       server:
-        webflux:
+        webmvc:
           routes:
-            - id: ms-productos-route
+            - id: productos-service
               uri: http://localhost:8081
               predicates:
-                - "Path=/api/v1/productos/**"
-                - "Path=/api/v1/categorias/**"
-                - "Path=/api/v1/marcas/**"
+                - Path=/api/v1/productos/**
+                - Path=/api/v1/categorias/**
+                - Path=/api/v1/marcas/**
 
-            - id: ms-locales-route
+            - id: locales-service
               uri: http://localhost:8082
               predicates:
-                - "Path=/api/v1/locales/**"
-                - "Path=/api/v1/comunas/**"
-                - "Path=/api/v1/regiones/**"
-                - "Path=/api/v1/clientes/**"
+                - Path=/api/v1/locales/**
+                - Path=/api/v1/comunas/**
+                - Path=/api/v1/regiones/**
+                - Path=/api/v1/clientes/**
 
-            - id: ms-ventas-route
+            - id: ventas-service
               uri: http://localhost:8083
               predicates:
-                - "Path=/api/v1/ventas/**"
-                - "Path=/api/v1/pagos/**"
-
-management:
-  endpoints:
-    web:
-      exposure:
-        include: health, info
+                - Path=/api/v1/ventas/**
+                - Path=/api/v1/pagos/**
