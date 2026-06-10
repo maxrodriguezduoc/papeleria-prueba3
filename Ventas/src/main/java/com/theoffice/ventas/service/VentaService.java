@@ -4,12 +4,11 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import com.theoffice.ventas.DTO.ProductoDTO;
 import com.theoffice.ventas.DTO.VentaDTO;
 import com.theoffice.ventas.model.Pago;
-import com.theoffice.ventas.model.Producto;
-import com.theoffice.ventas.model.Productos;
 import com.theoffice.ventas.model.Venta;
 import com.theoffice.ventas.repository.VentaRepository;
 
@@ -24,15 +23,39 @@ public class VentaService {
     @Autowired
     private VentaRepository ventaRepository;
 
-    @Autowired
-    private ProductoService productoService;
+    private WebClient.Builder webClientBuilder;
 
+    public VentaService(VentaRepository ventaRepository, WebClient.Builder webClientBuilder) {
+        this.ventaRepository = ventaRepository;
+        this.webClientBuilder = webClientBuilder;
+    }
+
+    private ProductoDTO obtenerProductoRemoto(Integer idProducto) {
+        log.info("Consultando producto ID {} vía WebClient a ms-productos", idProducto);
+        return webClientBuilder.build()
+                .get()
+                .uri("http://ms-productos/api/v1/productos/{id}", idProducto)
+                .retrieve()
+                .bodyToMono(ProductoDTO.class)
+                .block();
+    }
+
+    private void actualizarProductoRemoto(Integer idProducto, ProductoDTO productoActualizado) {
+        log.info("Enviando actualización de stock para producto ID {} vía WebClient", idProducto);
+        webClientBuilder.build()
+                .put()
+                .uri("http://ms-productos/api/v1/productos/{id}", idProducto) // Endpoint PUT de actualización del catálogo
+                .bodyValue(productoActualizado) // Enviamos el DTO con el nuevo stock en el cuerpo de la petición
+                .retrieve()
+                .bodyToMono(Void.class)
+                .block();
+    }
 
     public VentaDTO crear(Venta venta, Integer idProducto) {
         log.info("Iniciando creación de venta para Producto ID: {}", idProducto);
         
         // A. Buscamos el producto primero (Igual que como buscas en otros servicios)
-        ProductoDTO producto = productoService.buscarPorId(idProducto);
+        ProductoDTO producto = obtenerProductoRemoto(idProducto);
 
         // B. Validaciones de Regla de Negocio
         if (producto.getStock() < venta.getCantidad()) {
@@ -44,6 +67,9 @@ public class VentaService {
             log.error("Falla al crear venta: No se registraron métodos de pago");
             throw new RuntimeException("Debe ingresar al menos un método de pago para procesar la venta.");
         }
+        
+        int totalCalculado = producto.getPrecio_producto() * venta.getCantidad();
+        venta.setTotal_venta(totalCalculado);
 
         // 1. Validar que la suma de los pagos coincida exactamente con el total de la venta
         int sumaPagos = venta.getPagos().stream()
@@ -61,16 +87,11 @@ public class VentaService {
             pago.setActivo(true);
         }
 
-        venta.setTotal_venta(producto.getPrecio_producto() * venta.getCantidad());
         venta.setActivo(true);
 
-        Producto productoUpdate = new Producto();
-        productoUpdate.setNombre_producto(producto.getNombre_producto());
-        productoUpdate.setPrecio_producto(producto.getPrecio_producto());
-        productoUpdate.setStock(producto.getStock() - venta.getCantidad());
-        productoUpdate.setActivo(true);
+        producto.setStock(producto.getStock() - venta.getCantidad());
         
-        productoService.actualizarProducto(idProducto, productoUpdate);
+        actualizarProductoRemoto(idProducto, producto);
 
         Venta ventaGuardada = ventaRepository.save(venta);
         
@@ -120,12 +141,18 @@ public class VentaService {
         dto.setTotal_venta(venta.getTotal_venta());
         dto.setFecha_venta(venta.getFecha_venta());
         dto.setActivo(venta.isActivo());
-        if (venta.getProductos() != null && !venta.getProductos().isEmpty()) {
-            Productos primerDetalle = venta.getProductos().get(0);
-            if (primerDetalle != null && primerDetalle.getProducto() != null) {
-                dto.setNombreProducto(primerDetalle.getProducto().getNombre_producto());
+        
+        String nombreProd = "Producto no disponible";
+        try {
+            ProductoDTO p = obtenerProductoRemoto(venta.getId_producto());
+            if (p != null) {
+                nombreProd = p.getNombre_producto();
             }
+        } catch (Exception e) {
+            log.error("Error al recuperar nombre para el DTO: {}", e.getMessage());
         }
+    
+        dto.setNombreProducto(nombreProd);
         return dto;
     }
 }
