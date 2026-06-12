@@ -1,10 +1,10 @@
-package com.theoffice.api_gateway;
+package com.theoffice.eureka;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class ApiGatewayApplicationTests {
+class EurekaApplicationTests {
 
 	@Test
 	void contextLoads() {
