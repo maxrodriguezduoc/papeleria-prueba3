@@ -1,0 +1,68 @@
+server:
+  port: 0
+
+springdoc:
+  api-docs:
+    path: /Local/api-docs
+  
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+
+spring:
+  application:
+    name: Local
+  flyway:
+    enabled: 'true'
+    baseline-on-migrate: 'true'
+  jpa:
+    show-sql: 'true'
+
+  profiles:
+    active: dev 
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: dev
+  datasource:
+    username: root
+    url: jdbc:mysql://localhost:3306/db_papeleria_theoffice_dev?createDatabaseIfNotExist=true
+    driverClassName: com.mysql.cj.jdbc.Driver
+    password: ''
+  jpa:
+    hibernate:
+      ddl-auto: update # Permitimos que actualice localmente si es necesario
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: test
+  datasource:
+    username: root
+    url: jdbc:mysql://localhost:3306/db_papeleria_theoffice_test?createDatabaseIfNotExist=true
+    driverClassName: com.mysql.cj.jdbc.Driver
+    password: ''
+  jpa:
+    hibernate:
+      ddl-auto: update
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: prod
+  datasource:
+    username: root
+    url: jdbc:mysql://localhost:3306/db_papeleria_theoffice_prod?createDatabaseIfNotExist=true
+    driverClassName: com.mysql.cj.jdbc.Driver
+    password: ''
+  jpa:
+    hibernate:
+      ddl-auto: none
