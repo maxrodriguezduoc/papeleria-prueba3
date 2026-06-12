@@ -29,3 +29,23 @@ spring:
               predicates:
                 - Path=/api/v1/ventas/**
                 - Path=/api/v1/pagos/**
+            
+            - id: clientes-service
+              uri: http://localhost:8084
+              predicates:
+                - Path=/api/v1/clientes/**
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui/index.html
+    urls:
+      - name: Microservicio Ventas
+        url: /ventas/api-docs
+      - name: Microservicio Locales
+        url: /Local/api-docs
+      - name: Microservicio Productos
+        url: /producto/api-docs
+      - name: Microservicio Clientes
+        url: /cliente/api-docs
+  api-docs:
+    enabled: true
