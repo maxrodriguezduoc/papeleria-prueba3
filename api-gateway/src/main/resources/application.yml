@@ -10,30 +10,24 @@ spring:
         webmvc:
           routes:
             - id: productos-service
-              uri: http://localhost:8081
+              uri: lb://producto
               predicates:
-                - Path=/api/v1/productos/**
-                - Path=/api/v1/categorias/**
-                - Path=/api/v1/marcas/**
+                - Path=/api/v1/productos/**, /api/v1/categorias/**, /api/v1/marcas/**, /producto/api-docs/**
 
             - id: locales-service
-              uri: http://localhost:8082
+              uri: lb://local
               predicates:
-                - Path=/api/v1/locales/**
-                - Path=/api/v1/comunas/**
-                - Path=/api/v1/regiones/**
-                - Path=/api/v1/clientes/**
+                - Path=/api/v1/locales/**, /api/v1/comunas/**, /api/v1/regiones/**, /Local/api-docs/**
 
             - id: ventas-service
-              uri: http://localhost:8083
+              uri: lb://ventas
               predicates:
-                - Path=/api/v1/ventas/**
-                - Path=/api/v1/pagos/**
+                - Path=/api/v1/ventas/**, /api/v1/pagos/**, /ventas/api-docs/**
             
             - id: clientes-service
-              uri: http://localhost:8084
+              uri: lb://cliente
               predicates:
-                - Path=/api/v1/clientes/**
+                - Path=/api/v1/clientes/**, /cliente/api-docs/**
 
 springdoc:
   swagger-ui:
