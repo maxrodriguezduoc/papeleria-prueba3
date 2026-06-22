@@ -93,8 +93,7 @@
 		<dependency>
 			<groupId>net.datafaker</groupId>
 			<artifactId>datafaker</artifactId>
-			<version>2.4.0</version>
-			<scope>test</scope>
+			<version>2.4.2</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springdoc</groupId>
