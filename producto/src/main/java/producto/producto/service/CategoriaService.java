@@ -15,7 +15,7 @@ import producto.producto.repository.CategoriaRepository;
 @Transactional
 @Slf4j
 public class CategoriaService {
-     @Autowired
+    @Autowired
     private CategoriaRepository categoriaRepository;
 
     public CategoriaDTO crear(Categoria categoria) {

@@ -7,31 +7,39 @@ spring:
   cloud:
     gateway:
       server:
-        webflux:
+        webmvc:
           routes:
-            - id: ms-productos-route
-              uri: http://localhost:8081
+            - id: productos-service
+              uri: lb://producto
               predicates:
-                - "Path=/api/v1/productos/**"
-                - "Path=/api/v1/categorias/**"
-                - "Path=/api/v1/marcas/**"
+                - Path=/api/v1/productos/**, /api/v1/categorias/**, /api/v1/marcas/**, /producto/api-docs/**
 
-            - id: ms-locales-route
-              uri: http://localhost:8082
+            - id: locales-service
+              uri: lb://local
               predicates:
-                - "Path=/api/v1/locales/**"
-                - "Path=/api/v1/comunas/**"
-                - "Path=/api/v1/regiones/**"
-                - "Path=/api/v1/clientes/**"
+                - Path=/api/v1/locales/**, /api/v1/comunas/**, /api/v1/regiones/**, /Local/api-docs/**
 
-            - id: ms-ventas-route
-              uri: http://localhost:8083
+            - id: ventas-service
+              uri: lb://ventas
               predicates:
-                - "Path=/api/v1/ventas/**"
-                - "Path=/api/v1/pagos/**"
+                - Path=/api/v1/ventas/**, /api/v1/pagos/**, /ventas/api-docs/**
+            
+            - id: clientes-service
+              uri: lb://cliente
+              predicates:
+                - Path=/api/v1/clientes/**, /cliente/api-docs/**
 
-management:
-  endpoints:
-    web:
-      exposure:
-        include: health, info
+springdoc:
+  swagger-ui:
+    path: /swagger-ui/index.html
+    urls:
+      - name: Microservicio Ventas
+        url: /ventas/api-docs
+      - name: Microservicio Locales
+        url: /Local/api-docs
+      - name: Microservicio Productos
+        url: /producto/api-docs
+      - name: Microservicio Clientes
+        url: /cliente/api-docs
+  api-docs:
+    enabled: true
