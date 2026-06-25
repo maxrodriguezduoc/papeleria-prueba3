@@ -7,7 +7,6 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,54 +16,54 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import Ubicacion.Local.assembler.LocalModelAssembler;
-import Ubicacion.Local.dto.LocalDTO;
-import Ubicacion.Local.model.Local;
-import Ubicacion.Local.service.LocalService;
+import Ubicacion.Local.assembler.ComunaModelAssembler;
+import Ubicacion.Local.dto.ComunaDTO;
+import Ubicacion.Local.model.Comuna;
+import Ubicacion.Local.service.ComunaService;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @RestController
 @RequestMapping("/api/v2/locales")
-public class LocalControllerV2 {
+public class ComunaControllerV2 {
 
     @Autowired
-    private LocalService localService;
+    private ComunaService comunaService;
 
     @Autowired
-    private LocalModelAssembler assembler;
+    private ComunaModelAssembler assembler;
 
     @GetMapping
-    public CollectionModel<EntityModel<LocalDTO>> listar(){
+    public CollectionModel<EntityModel<ComunaDTO>> listar(){
 
-        log.info("API REST V2 - PETICIÓN PARA LISTAR LOCALES ACTIVOS");
+        log.info("API REST V2 - PETICIÓN PARA LISTAR COMUNAS ACTIVAS");
 
-        List<EntityModel<LocalDTO>> locales = localService.obtenerTodos()
+        List<EntityModel<ComunaDTO>> comunas = comunaService.obtenerTodos()
                 .stream()
                 .map(assembler::toModel)
                 .toList();
 
-        return CollectionModel.of(locales,
-                linkTo(methodOn(LocalControllerV2.class).listar()).withSelfRel());
+        return CollectionModel.of(comunas,
+                linkTo(methodOn(ComunaControllerV2.class).listar()).withSelfRel());
     }
 
     @GetMapping("/{id}")
-    public EntityModel<LocalDTO> buscar(@PathVariable Integer id){
+    public EntityModel<ComunaDTO> buscar(@PathVariable Integer id){
 
         log.info("API REST V2 - PETICIÓN PARA BUSCAR LOCAL POR ID: {}", id);
 
-        LocalDTO local = localService.buscarPorId(id);
+        ComunaDTO comuna = comunaService.buscarPorId(id);
 
-        return assembler.toModel(local);
+        return assembler.toModel(comuna);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<EntityModel<LocalDTO>> actualizar(@PathVariable Integer id, @Valid @RequestBody Local local){
+    public ResponseEntity<EntityModel<ComunaDTO>> actualizar(@PathVariable Integer id, @Valid @RequestBody Comuna comuna){
 
-        log.info("API REST V2 - PETICIÓN PARA ACTUALIZAR LOCAL CON ID: {}", id);
+        log.info("API REST V2 - PETICIÓN PARA ACTUALIZAR COMUNA CON ID: {}", id);
 
-        LocalDTO actualizado = localService.actualizarLocal(id, local);
+        ComunaDTO actualizado = comunaService.actualizarComuna(id, comuna);
 
         return ResponseEntity.ok(assembler.toModel(actualizado));
     }
@@ -72,10 +71,10 @@ public class LocalControllerV2 {
     @DeleteMapping("/{id}")
     public ResponseEntity<String> eliminar(@PathVariable Integer id){
 
-        log.warn("API REST V2 - PETICIÓN PARA DESACIVAR LOCAL CON ID: {}", id);
+        log.warn("API REST V2 - PETICIÓN PARA DESACIVAR COMUNA CON ID: {}", id);
 
-        localService.eliminarLocal(id);
+        comunaService.eliminarComuna(id);
 
-        return ResponseEntity.ok("LOCAL CON ID " + id + " ELIMINADO CON EXITO!");
+        return ResponseEntity.ok("COMUNA CON ID " + id + " ELIMINADO CON EXITO!");
     }
 }
