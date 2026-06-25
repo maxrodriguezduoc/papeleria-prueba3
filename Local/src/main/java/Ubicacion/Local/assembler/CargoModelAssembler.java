@@ -18,7 +18,7 @@ public class CargoModelAssembler implements RepresentationModelAssembler<CargoDT
                 linkTo(methodOn(CargoControllerV2.class)
                 .buscar(cargo.getIdCargo()))
                 .withSelfRel(),
-                
+
                 linkTo(methodOn(CargoControllerV2.class)
                 .listar())
                 .withRel("cargos"),
