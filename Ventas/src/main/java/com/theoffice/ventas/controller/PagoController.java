@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/tipos-pago")
+@RequestMapping("/api/v1/pagos")
 @Slf4j
 public class PagoController {
 
