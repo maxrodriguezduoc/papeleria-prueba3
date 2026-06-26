@@ -8,8 +8,8 @@
 		<version>4.0.6</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>com.cliente</groupId>
-	<artifactId>cliente</artifactId>
+	<groupId>com.theoffice</groupId>
+	<artifactId>ventas</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name/>
 	<description/>
@@ -93,8 +93,7 @@
 		<dependency>
 			<groupId>net.datafaker</groupId>
 			<artifactId>datafaker</artifactId>
-			<version>2.4.0</version>
-			<scope>test</scope>
+			<version>2.4.2</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springdoc</groupId>
@@ -107,15 +106,9 @@
 			<version>5.0.1</version>
 		</dependency>
 		<dependency>
-  			<groupId>org.springframework.boot</groupId>
-  			<artifactId>spring-boot-starter-hateoas</artifactId>
-		</dependency>
-		<dependency>
 			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-test</artifactId>
-			<scope>test</scope>
-		</dependency>
-
+			<artifactId>spring-boot-starter-hateoas</artifactId>
+  		</dependency>
 	</dependencies>
 
 	<build>
@@ -171,4 +164,16 @@
 		</plugins>
 	</build>
 
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.springframework.cloud</groupId>
+				<artifactId>spring-cloud-dependencies</artifactId>
+				<version>2025.1.1</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
 </project>
