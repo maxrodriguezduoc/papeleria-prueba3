@@ -31,10 +31,10 @@ public class VentaService {
     }
 
     private ProductoDTO obtenerProductoRemoto(Integer idProducto) {
-        log.info("Consultando producto ID {} vía WebClient a ms-productos", idProducto);
+        log.info("Consultando producto ID {} vía WebClient a ms-producto", idProducto);
         return webClientBuilder.build()
                 .get()
-                .uri("http://ms-productos/api/v1/productos/{id}", idProducto)
+                .uri("http://producto/api/v1/productos/{id}", idProducto)
                 .retrieve()
                 .bodyToMono(ProductoDTO.class)
                 .block();
@@ -44,8 +44,8 @@ public class VentaService {
         log.info("Enviando actualización de stock para producto ID {} vía WebClient", idProducto);
         webClientBuilder.build()
                 .put()
-                .uri("http://ms-productos/api/v1/productos/{id}", idProducto) // Endpoint PUT de actualización del catálogo
-                .bodyValue(productoActualizado) // Enviamos el DTO con el nuevo stock en el cuerpo de la petición
+                .uri("http://producto/api/v1/productos/{id}", idProducto)
+                .bodyValue(productoActualizado)
                 .retrieve()
                 .bodyToMono(Void.class)
                 .block();
@@ -54,10 +54,8 @@ public class VentaService {
     public VentaDTO crear(Venta venta, Integer idProducto) {
         log.info("Iniciando creación de venta para Producto ID: {}", idProducto);
         
-        // A. Buscamos el producto primero (Igual que como buscas en otros servicios)
         ProductoDTO producto = obtenerProductoRemoto(idProducto);
 
-        // B. Validaciones de Regla de Negocio
         if (producto.getStock() < venta.getCantidad()) {
             log.error("Error de stock: Pedido {}, Disponible {}", venta.getCantidad(), producto.getStock());
             throw new RuntimeException("No hay suficiente stock para realizar esta venta.");
@@ -71,7 +69,6 @@ public class VentaService {
         int totalCalculado = producto.getPrecio_producto() * venta.getCantidad();
         venta.setTotal_venta(totalCalculado);
 
-        // 1. Validar que la suma de los pagos coincida exactamente con el total de la venta
         int sumaPagos = venta.getPagos().stream()
                 .mapToInt(Pago::getMonto)
                 .sum();
@@ -81,7 +78,6 @@ public class VentaService {
             throw new RuntimeException("El monto total de los pagos ingresados debe ser exactamente igual al total de la venta.");
         }
 
-        // 2. Asociar físicamente cada pago a la venta
         for (Pago pago : venta.getPagos()) {
             pago.setVenta(venta);
             pago.setActivo(true);
