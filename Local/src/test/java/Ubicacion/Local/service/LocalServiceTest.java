@@ -7,6 +7,7 @@ import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
@@ -117,4 +118,96 @@ public class LocalServiceTest {
         verify(localRepository, atLeastOnce())
             .findById(idBuscado);
     }
+
+    @Test
+    void testObtenerTodos() {
+
+        Comuna comuna = new Comuna();
+        comuna.setIdComuna(1);
+        comuna.setNombreComuna("Cerrillos");
+
+        Local local = new Local();
+        local.setIdLocal(1);
+        local.setNombreLocal("Sucursal Plaza Oeste");
+        local.setDireccion("Av. Americo Vespucio 1501");
+        local.setActivo(true);
+        local.setComuna(comuna);
+
+        when(localRepository.findAll())
+                .thenReturn(List.of(local));
+
+        List<LocalDTO> resultado = localService.obtenerTodos();
+
+        assertNotNull(resultado);
+        assertEquals(1, resultado.size());
+        assertEquals("Sucursal Plaza Oeste", resultado.get(0).getNombreLocal());
+
+        verify(localRepository).findAll();
+     }      
+     
+     @Test
+     void testEliminarLocal() {
+
+        Integer id = 1;
+
+        Comuna comuna = new Comuna();
+        comuna.setIdComuna(1);
+
+        Local local = new Local();
+        local.setIdLocal(id);
+        local.setNombreLocal("Sucursal Plaza Oeste");
+        local.setDireccion("Av. Americo Vespucio");
+        local.setActivo(true);
+        local.setComuna(comuna);
+
+        when(localRepository.findById(id))
+                .thenReturn(Optional.of(local));
+
+        when(localRepository.save(any(Local.class)))
+                .thenReturn(local);
+
+        localService.eliminarLocal(id);
+
+        assertEquals(false, local.isActivo());
+
+        verify(localRepository).findById(id);
+        verify(localRepository).save(local);
+     }
+
+     @Test
+     void testActualizarLocal() {
+
+        Integer id = 1;
+
+        Comuna comuna = new Comuna();
+        comuna.setIdComuna(1);
+        comuna.setNombreComuna("Cerrillos");
+
+        Local existente = new Local();
+        existente.setIdLocal(id);
+        existente.setNombreLocal("Sucursal Antigua");
+        existente.setDireccion("Direccion Antigua");
+        existente.setActivo(true);
+        existente.setComuna(comuna);
+
+        Local nuevosDatos = new Local();
+        nuevosDatos.setNombreLocal("Sucursal Nueva");
+        nuevosDatos.setDireccion("Direccion Nueva");
+        nuevosDatos.setComuna(comuna);
+
+        when(localRepository.findById(id))
+                .thenReturn(Optional.of(existente));
+
+        when(localRepository.save(any(Local.class)))
+                .thenReturn(existente);
+
+        LocalDTO resultado = localService.actualizarLocal(id, nuevosDatos);
+
+        assertNotNull(resultado);
+        assertEquals("Sucursal Nueva", resultado.getNombreLocal());
+        assertEquals("Direccion Nueva", resultado.getDireccion());
+
+        verify(localRepository).findById(id);
+        verify(localRepository).save(any(Local.class));
+     }
 }
