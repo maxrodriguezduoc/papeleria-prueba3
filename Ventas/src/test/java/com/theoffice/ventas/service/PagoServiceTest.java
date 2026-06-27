@@ -1,4 +1,4 @@
-package test.java.com.theoffice.ventas.service;
+package com.theoffice.ventas.service;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
