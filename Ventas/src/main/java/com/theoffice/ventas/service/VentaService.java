@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import com.theoffice.ventas.DTO.ProductoDTO;
+import com.theoffice.ventas.DTO.ProductoExternoDTO;
 import com.theoffice.ventas.DTO.VentaDTO;
 import com.theoffice.ventas.model.Pago;
 import com.theoffice.ventas.model.Venta;
@@ -30,17 +30,17 @@ public class VentaService {
         this.webClientBuilder = webClientBuilder;
     }
 
-    private ProductoDTO obtenerProductoRemoto(Integer idProducto) {
+    private ProductoExternoDTO obtenerProductoRemoto(Integer idProducto) {
         log.info("Consultando producto ID {} vía WebClient a ms-producto", idProducto);
         return webClientBuilder.build()
                 .get()
                 .uri("http://producto/api/v1/productos/{id}", idProducto)
                 .retrieve()
-                .bodyToMono(ProductoDTO.class)
+                .bodyToMono(ProductoExternoDTO.class)
                 .block();
     }
 
-    private void actualizarProductoRemoto(Integer idProducto, ProductoDTO productoActualizado) {
+    private void actualizarProductoRemoto(Integer idProducto, ProductoExternoDTO productoActualizado) {
         log.info("Enviando actualización de stock para producto ID {} vía WebClient", idProducto);
         webClientBuilder.build()
                 .put()
@@ -54,7 +54,7 @@ public class VentaService {
     public VentaDTO crear(Venta venta, Integer idProducto) {
         log.info("Iniciando creación de venta para Producto ID: {}", idProducto);
         
-        ProductoDTO producto = obtenerProductoRemoto(idProducto);
+        ProductoExternoDTO producto = obtenerProductoRemoto(idProducto);
 
         if (producto.getStock() < venta.getCantidad()) {
             log.error("Error de stock: Pedido {}, Disponible {}", venta.getCantidad(), producto.getStock());
@@ -140,7 +140,7 @@ public class VentaService {
         
         String nombreProd = "Producto no disponible";
         try {
-            ProductoDTO p = obtenerProductoRemoto(venta.getId_producto());
+            ProductoExternoDTO p = obtenerProductoRemoto(venta.getId_producto());
             if (p != null) {
                 nombreProd = p.getNombre_producto();
             }

@@ -6,7 +6,6 @@ import com.theoffice.ventas.model.Pago;
 import com.theoffice.ventas.service.PagoService;
 
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,10 +27,10 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 public class PagoControllerV2 {
 
     @Autowired
-    private final PagoService pagoService;
+    private PagoService pagoService;
 
     @Autowired
-    private final PagoModelAssembler assembler;
+    private PagoModelAssembler assembler;
 
     @PostMapping(produces = MediaTypes.HAL_JSON_VALUE)
     public ResponseEntity<EntityModel<PagoDTO>> crear(@Valid @RequestBody Pago tipoPago) {

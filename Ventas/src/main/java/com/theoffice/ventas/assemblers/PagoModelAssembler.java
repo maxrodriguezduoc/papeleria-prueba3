@@ -20,7 +20,7 @@ public class PagoModelAssembler implements RepresentationModelAssembler<PagoDTO,
 
         return EntityModel.of(pagoDTO,
                 linkTo(methodOn(PagoControllerV2.class).obtenerPorId(id)).withSelfRel(),
-                linkTo(methodOn(PagoControllerV2.class).obtenerTodos()).withRel("tipos-pago"),
+                linkTo(methodOn(PagoControllerV2.class).obtenerTodos()).withRel("pagos"),
                 linkTo(methodOn(PagoControllerV2.class).actualizar(id, null)).withRel("actualizar"),
                 linkTo(methodOn(PagoControllerV2.class).eliminar(id)).withRel("eliminar")
         );
