@@ -44,7 +44,6 @@ public class ClienteControllerV2 {
         
         ClienteDTO nuevoCliente = clienteService.crear(cliente);
         
-        // Retorna un HTTP 201 Created con la URI en las cabeceras y el cuerpo con HATEOAS
         return ResponseEntity
                 .created(linkTo(methodOn(ClienteControllerV2.class).obtenerPorId(nuevoCliente.getIdCliente())).toUri())
                 .body(assembler.toModel(nuevoCliente));
