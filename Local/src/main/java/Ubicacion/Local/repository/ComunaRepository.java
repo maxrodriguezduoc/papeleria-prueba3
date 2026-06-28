@@ -7,4 +7,5 @@ import Ubicacion.Local.model.Comuna;
 
 @Repository
 public interface ComunaRepository extends JpaRepository<Comuna, Integer>{
+    boolean existsByNombreComunaAndRegion_IdRegion(String nombreComuna, Integer idRegion);
 }

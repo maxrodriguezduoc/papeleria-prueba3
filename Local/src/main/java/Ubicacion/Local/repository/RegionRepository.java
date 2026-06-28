@@ -7,4 +7,5 @@ import Ubicacion.Local.model.Region;
 
 @Repository
 public interface RegionRepository extends JpaRepository<Region, Integer>{
+    boolean existsByNombreRegion(String nombreRegion);
 }
