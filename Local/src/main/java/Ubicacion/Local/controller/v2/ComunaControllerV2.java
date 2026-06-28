@@ -1,16 +1,20 @@
 package Ubicacion.Local.controller.v2;
 
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,7 +29,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/v2/comunass")
+@RequestMapping("/api/v2/comunas")
 public class ComunaControllerV2 {
 
     @Autowired
@@ -34,47 +38,56 @@ public class ComunaControllerV2 {
     @Autowired
     private ComunaModelAssembler assembler;
 
-    @GetMapping
-    public CollectionModel<EntityModel<ComunaDTO>> listar(){
+    @PostMapping(produces = MediaTypes.HAL_JSON_VALUE)
+    public ResponseEntity<EntityModel<ComunaDTO>> crear(@Valid @RequestBody Comuna comuna) {
+        log.info("API REST V2 - PETICIÓN PARA POSTEAR COMUNAS: '{}'", comuna.getNombreComuna());
+        
+        ComunaDTO nuevaComuna = comunaService.guardarComuna(comuna);
+        
+        return ResponseEntity
+                .created(linkTo(methodOn(ComunaControllerV2.class).buscar(nuevaComuna.getIdComuna())).toUri())
+                .body(assembler.toModel(nuevaComuna));
+    }
 
-        log.info("API REST V2 - PETICIÓN PARA LISTAR COMUNAS ACTIVOS");
-
-        List<EntityModel<ComunaDTO>> comunas = comunaService.obtenerTodos()
-                .stream()
+    @GetMapping(produces = MediaTypes.HAL_JSON_VALUE)
+    public ResponseEntity<CollectionModel<EntityModel<ComunaDTO>>> listar() {
+        log.info("API REST V2 - PETICIÓN PARA LISTAR COMUNAS");
+        
+        List<EntityModel<ComunaDTO>> comunas = comunaService.obtenerTodos().stream()
                 .map(assembler::toModel)
-                .toList();
-
-        return CollectionModel.of(comunas,
-                linkTo(methodOn(ComunaControllerV2.class).listar()).withSelfRel());
+                .collect(Collectors.toList());
+        
+        if (comunas.isEmpty()) {
+            log.info("LA CONSULTA DE COMUNAS NO RETORNO REGISTROS ACTIVOS");
+            return ResponseEntity.noContent().build();
+        }
+        
+        return ResponseEntity.ok(CollectionModel.of(
+            comunas, linkTo(methodOn(ComunaControllerV2.class).listar()).withSelfRel()
+        ));
     }
 
-    @GetMapping("/{id}")
-    public EntityModel<ComunaDTO> buscar(@PathVariable Integer id){
-
-        log.info("API REST V2 - PETICIÓN PARA BUSCAR COMUNA POR ID: {}", id);
-
+    @GetMapping(value = "/{id}", produces = MediaTypes.HAL_JSON_VALUE)
+    public ResponseEntity<EntityModel<ComunaDTO>> buscar(@PathVariable Integer id) {
+        log.info("API REST V2 - PETICIÓN PARA BUSCAR COMUNA CON ID: {}", id);
+        
         ComunaDTO comuna = comunaService.buscarPorId(id);
-
-        return assembler.toModel(comuna);
+        return ResponseEntity.ok(assembler.toModel(comuna));
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<EntityModel<ComunaDTO>> actualizar(@PathVariable Integer id, @Valid @RequestBody Comuna comuna){
-
+    @PutMapping(value = "/{id}", produces = MediaTypes.HAL_JSON_VALUE)
+    public ResponseEntity<EntityModel<ComunaDTO>> actualizar(@PathVariable Integer id, @Valid @RequestBody Comuna comuna) {
         log.info("API REST V2 - PETICIÓN PARA ACTUALIZAR COMUNA CON ID: {}", id);
-
-        ComunaDTO actualizado = comunaService.actualizarComuna(id, comuna);
-
-        return ResponseEntity.ok(assembler.toModel(actualizado));
+        
+        ComunaDTO actualizada = comunaService.actualizarComuna(id, comuna);
+        return ResponseEntity.ok(assembler.toModel(actualizada));
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<String> eliminar(@PathVariable Integer id){
-
-        log.warn("API REST V2 - PETICIÓN PARA DESACIVAR COMUNA CON ID: {}", id);
-
+    @DeleteMapping(value = "/{id}", produces = MediaTypes.HAL_JSON_VALUE)
+    public ResponseEntity<Void> eliminar(@PathVariable Integer id) {
+        log.warn("API REST V2 - PETICIÓN PARA ELIMINAR COMUNA CON ID: {}", id);
+        
         comunaService.eliminarComuna(id);
-
-        return ResponseEntity.ok("COMUNA CON ID " + id + " ELIMINADO CON EXITO!");
+        return ResponseEntity.noContent().build(); 
     }
 }
