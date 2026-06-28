@@ -7,4 +7,5 @@ import Ubicacion.Local.model.Cargo;
 
 @Repository
 public interface CargoRepository extends JpaRepository<Cargo, Integer>{
+    boolean existsByNombreCargo(String nombreCargo);
 }
