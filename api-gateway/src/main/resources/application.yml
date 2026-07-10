@@ -1,5 +1,6 @@
 server:
   port: 8080
+  forward-headers-strategy: framework
 
 spring:
   application:
@@ -8,6 +9,16 @@ spring:
     gateway:
       server:
         webmvc:
+          globalcors:
+            cors-configurations:
+              '[/**]':
+                allowed-origin-patterns: "*"
+                allowed-methods: "*"
+                allowed-headers: "*"
+                exposed-headers: "*"
+                allow-credentials: false
+                max-age: 3600
+
           routes:
             - id: productos-service
               uri: lb://producto
@@ -41,6 +52,8 @@ springdoc:
         url: /producto/api-docs
       - name: Microservicio Clientes
         url: /cliente/api-docs
+    disable-swagger-default-url: true
+    display-request-duration: true
   api-docs:
     enabled: true
 
