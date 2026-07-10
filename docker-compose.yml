@@ -1,0 +1,115 @@
+version: '3.8'
+
+services:
+ mariadb-db:
+   image: mariadb:10.11
+   container_name: mariadb-db
+   ports:
+     - "3306:3306"
+   environment:
+     MYSQL_ROOT_PASSWORD: ""
+     MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+     MYSQL_DATABASE: db_papeleria_theoffice_dev
+   networks:
+     - network-theoffice
+   healthcheck:
+     test: ["CMD", "mariadb-admin", "ping", "-h", "localhost", "-u", "root"]
+     interval: 10s
+     timeout: 5s
+     retries: 20
+
+ eureka-server:
+   build: ./eureka
+   container_name: eureka-server
+   ports:
+     - "8761:8761"
+   networks:
+     - network-theoffice
+   healthcheck:
+     test: ["CMD", "curl", "-f", "http://localhost:8761/actuator/health"]
+     interval: 15s
+     timeout: 5s
+     retries: 10
+     start_period: 30s
+
+ api-gateway:
+   build: ./gateway
+   container_name: api-gateway
+   ports:
+     - "8080:8080"
+   environment:
+     EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://eureka-server:8761/eureka/
+     SPRING_PROFILES_ACTIVE: dev
+   networks:
+     - network-theoffice
+   depends_on:
+     eureka-server:
+       condition: service_healthy
+
+ cliente-service:
+   build: ./cliente
+   container_name: cliente-service
+   environment:
+     SPRING_PROFILES_ACTIVE: dev
+     EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://eureka-server:8761/eureka/
+     DATABASE_HOST: mariadb-db
+     GATEWAY_URL: http://localhost:8080
+   networks:
+     - network-theoffice
+   depends_on:
+     mariadb-db:
+       condition: service_healthy
+     eureka-server:
+       condition: service_healthy
+
+ local-service:
+   build: ./Local
+   container_name: local-service
+   environment:
+     SPRING_PROFILES_ACTIVE: dev
+     EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://eureka-server:8761/eureka/
+     DATABASE_HOST: mariadb-db
+     GATEWAY_URL: http://localhost:8080
+   networks:
+     - network-theoffice
+   depends_on:
+     mariadb-db:
+       condition: service_healthy
+     eureka-server:
+       condition: service_healthy
+
+ producto-service:
+   build: ./producto
+   container_name: producto-service
+   environment:
+     SPRING_PROFILES_ACTIVE: dev
+     EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://eureka-server:8761/eureka/
+     DATABASE_HOST: mariadb-db
+     GATEWAY_URL: http://localhost:8080
+   networks:
+     - network-theoffice
+   depends_on:
+     mariadb-db:
+       condition: service_healthy
+     eureka-server:
+       condition: service_healthy
+
+ ventas-service:
+   build: ./Ventas
+   container_name: ventas-service
+   environment:
+     SPRING_PROFILES_ACTIVE: dev
+     EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://eureka-server:8761/eureka/
+     DATABASE_HOST: mariadb-db
+     GATEWAY_URL: http://localhost:8080
+   networks:
+     - network-theoffice
+   depends_on:
+     mariadb-db:
+       condition: service_healthy
+     eureka-server:
+       condition: service_healthy
+
+networks:
+ network-theoffice:
+   driver: bridge

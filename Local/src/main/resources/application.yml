@@ -8,11 +8,14 @@ springdoc:
 eureka:
   client:
     service-url:
-      defaultZone: http://localhost:8761/eureka/
+      defaultZone: ${EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE:http://localhost:8761/eureka/}
+  instance:
+    prefer-ip-address: true
+    instance-id: ${spring.application.name}:${random.value}
 
 spring:
   application:
-    name: Local
+    name: local
   flyway:
     enabled: 'true'
     baseline-on-migrate: 'true'
@@ -21,6 +24,16 @@ spring:
 
   profiles:
     active: dev 
+  mvc:
+    cors:
+      mappings:
+        "/**":
+          allowed-origin-patterns: "*"
+          allowed-methods: GET, POST, PUT, DELETE, PATCH, OPTIONS
+          allowed-headers: "*"
+          exposed-headers: "*"
+          allow-credentials: false
+          max-age: 3600
 
 ---
 
@@ -29,10 +42,10 @@ spring:
     activate:
       on-profile: dev
   datasource:
+    url: jdbc:mysql://${DATABASE_HOST:localhost}:3306/db_papeleria_theoffice_dev?createDatabaseIfNotExist=true&allowPublicKeyRetrieval=true&useSSL=false
     username: root
-    url: jdbc:mysql://localhost:3306/db_papeleria_theoffice_dev?createDatabaseIfNotExist=true
-    driverClassName: com.mysql.cj.jdbc.Driver
     password: ''
+    driverClassName: com.mysql.cj.jdbc.Driver
   jpa:
     hibernate:
       ddl-auto: update # Permitimos que actualice localmente si es necesario
