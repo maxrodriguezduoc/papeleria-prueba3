@@ -12,22 +12,22 @@ spring:
             - id: productos-service
               uri: lb://producto
               predicates:
-                - Path=/api/v1/productos/**, /api/v1/categorias/**, /api/v1/marcas/**, /producto/api-docs/**
+                - Path=/api/v2/productos/**, /api/v2/categorias/**, /api/v2/marcas/**, /api/v2/colores/**, /api/v2/tipoProductos/**, /producto/api-docs/**
 
             - id: locales-service
               uri: lb://local
               predicates:
-                - Path=/api/v1/locales/**, /api/v1/comunas/**, /api/v1/regiones/**, /Local/api-docs/**
+                - Path=/api/v2/locales/**, /api/v2/comunas/**, /api/v2/regiones/**, /api/v2/colaboradores/**, /api/v2/cargos/**, /Local/api-docs/**
 
             - id: ventas-service
               uri: lb://ventas
               predicates:
-                - Path=/api/v1/ventas/**, /api/v1/pagos/**, /ventas/api-docs/**
+                - Path=/api/v2/ventas/**, /api/v2/pagos/**, /api/v2/tarjetas/**, /api/v2/transferencias/**, /ventas/api-docs/**
             
             - id: clientes-service
               uri: lb://cliente
               predicates:
-                - Path=/api/v1/clientes/**, /cliente/api-docs/**
+                - Path=/api/v2/clientes/**, /cliente/api-docs/**
 
 springdoc:
   swagger-ui:
@@ -43,3 +43,10 @@ springdoc:
         url: /cliente/api-docs
   api-docs:
     enabled: true
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE:http://localhost:8761/eureka/}
+  instance:
+    prefer-ip-address: false

@@ -1,4 +1,4 @@
-package com.theoffice.ventas.controller;
+package com.theoffice.ventas.controller.v1;
 
 import com.theoffice.ventas.DTO.PagoDTO;
 import com.theoffice.ventas.model.Pago;

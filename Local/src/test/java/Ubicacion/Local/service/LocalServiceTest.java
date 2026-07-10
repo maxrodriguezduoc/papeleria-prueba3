@@ -1,11 +1,8 @@
 package Ubicacion.Local.service;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.atLeastOnce;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 
 import java.util.List;
 import java.util.Optional;
@@ -19,11 +16,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import Ubicacion.Local.dto.LocalDTO;
 import Ubicacion.Local.model.Comuna;
 import Ubicacion.Local.model.Local;
-import Ubicacion.Local.model.Region;
 import Ubicacion.Local.repository.LocalRepository;
 
 @ExtendWith(MockitoExtension.class)
-public class LocalServiceTest {
+class LocalServiceTest {
 
     @Mock
     private LocalRepository localRepository;
@@ -32,91 +28,62 @@ public class LocalServiceTest {
     private LocalService localService;
 
     @Test
-    void testGuardadoExitosoLocal(){
+    void testGuardarLocal() {
 
         Comuna comuna = new Comuna();
         comuna.setIdComuna(1);
         comuna.setNombreComuna("Cerrillos");
-        comuna.setCodigoPostal("8320000");
 
-        Local localFalso = new Local();
-        localFalso.setIdLocal(1);
-        localFalso.setNombreLocal("Sucursal Plaza Oeste");
-        localFalso.setDireccion("Av. Americo Vespucio 1501");
-        localFalso.setActivo(true);
-        localFalso.setComuna(comuna);
+        Local local = new Local();
+        local.setNombreLocal("Sucursal Plaza Oeste");
+        local.setDireccion("Av. Americo Vespucio 1501");
+        local.setActivo(true);
+        local.setComuna(comuna);
 
-        when(localRepository.save(any(Local.class)))
-                .thenReturn(localFalso);
+        when(localRepository.save(any(Local.class))).thenAnswer(inv -> {
+            Local l = inv.getArgument(0);
+            l.setIdLocal(1);
+            return l;
+        });
 
-        LocalDTO resultado = localService.guardarLocal(localFalso);
+        LocalDTO resultado = localService.guardarLocal(local);
 
-        assertNotNull(resultado,
-                "El DTO resultante no deberia ser nulo!");
-        
-        assertEquals("Sucursal Plaza Oeste",
-                resultado.getNombreLocal(),
-                "El nombre de Local debe coincidir!");
+        assertNotNull(resultado);
+        assertEquals(1, resultado.getIdLocal());
+        assertEquals("Sucursal Plaza Oeste", resultado.getNombreLocal());
+        assertEquals("Av. Americo Vespucio 1501", resultado.getDireccion());
+        assertEquals(1, resultado.getComunaId());
 
-        assertEquals("Av. Americo Vespucio 1501", 
-                resultado.getDireccion(),
-                "La direccion de Local debe coincidir!");
-
-        assertEquals(1,
-                resultado.getComunaId(),
-                "La comuna de Local debe coincidir!");
-
-        verify(localRepository, atLeastOnce())
-                .save(any(Local.class));
+        verify(localRepository, times(1)).save(any(Local.class));
     }
 
     @Test
-    void testBuscarPorId(){
+    void testBuscarPorId() {
 
-        Integer idBuscado = 1;
-
-        Region region = new Region();
-        region.setIdRegion(1);
-        region.setNombreRegion("Region Metropolitana");
-        region.setActivo(true);
+        Integer id = 1;
 
         Comuna comuna = new Comuna();
         comuna.setIdComuna(1);
         comuna.setNombreComuna("Cerrillos");
-        comuna.setCodigoPostal("8320000");
 
-        Local localFalso = new Local();
-        localFalso.setIdLocal(1);
-        localFalso.setNombreLocal("Sucursal Plaza Oeste");
-        localFalso.setDireccion("Av. Americo Vespucio 1501");
-        localFalso.setActivo(true);
-        localFalso.setComuna(comuna);
+        Local local = new Local();
+        local.setIdLocal(id);
+        local.setNombreLocal("Sucursal Plaza Oeste");
+        local.setDireccion("Av. Americo Vespucio 1501");
+        local.setActivo(true);
+        local.setComuna(comuna);
 
-        when(localRepository.findById(idBuscado))
-                .thenReturn(Optional.of(localFalso));
+        when(localRepository.findById(id)).thenReturn(Optional.of(local));
 
-        LocalDTO resultado = localService.buscarPorId(idBuscado);
+        LocalDTO resultado = localService.buscarPorId(id);
 
-        assertNotNull(resultado,
-                "El DTO resultante no deberia ser nulo!");
+        assertNotNull(resultado);
+        assertEquals(id, resultado.getIdLocal());
+        assertEquals("Sucursal Plaza Oeste", resultado.getNombreLocal());
+        assertEquals("Av. Americo Vespucio 1501", resultado.getDireccion());
+        assertEquals(1, resultado.getComunaId());
 
-        assertEquals(idBuscado,
-                resultado.getIdLocal(),
-                "La ID del Local debe coincidir!");
-
-        assertEquals("Sucursal Plaza Oeste", 
-                resultado.getNombreLocal(),
-                "El nombre del Local debe coincidir!");
-
-        assertEquals("Av. Americo Vespucio 1501", 
-                resultado.getDireccion(),
-                "La direccion del Local debe coincidir!");
-
-        assertEquals(1, 
-                resultado.getComunaId(),
-                "La comuna del Local debe coincidir!");
-        verify(localRepository, atLeastOnce())
-            .findById(idBuscado);
+        verify(localRepository, times(1)).findById(id);
     }
 
     @Test
@@ -133,8 +100,7 @@ public class LocalServiceTest {
         local.setActivo(true);
         local.setComuna(comuna);
 
-        when(localRepository.findAll())
-                .thenReturn(List.of(local));
+        when(localRepository.findAll()).thenReturn(List.of(local));
 
         List<LocalDTO> resultado = localService.obtenerTodos();
 
@@ -142,11 +108,11 @@ public class LocalServiceTest {
         assertEquals(1, resultado.size());
         assertEquals("Sucursal Plaza Oeste", resultado.get(0).getNombreLocal());
 
-        verify(localRepository).findAll();
-     }      
-     
-     @Test
-     void testEliminarLocal() {
+        verify(localRepository, times(1)).findAll();
+    }
+
+    @Test
+    void testEliminarLocal() {
 
         Integer id = 1;
 
@@ -160,22 +126,19 @@ public class LocalServiceTest {
         local.setActivo(true);
         local.setComuna(comuna);
 
-        when(localRepository.findById(id))
-                .thenReturn(Optional.of(local));
-
-        when(localRepository.save(any(Local.class)))
-                .thenReturn(local);
+        when(localRepository.findById(id)).thenReturn(Optional.of(local));
+        when(localRepository.save(any(Local.class))).thenReturn(local);
 
         localService.eliminarLocal(id);
 
-        assertEquals(false, local.isActivo());
+        assertFalse(local.isActivo());
 
-        verify(localRepository).findById(id);
-        verify(localRepository).save(local);
-     }
+        verify(localRepository, times(1)).findById(id);
+        verify(localRepository, times(1)).save(local);
+    }
 
-     @Test
-     void testActualizarLocal() {
+    @Test
+    void testActualizarLocal() {
 
         Integer id = 1;
 
@@ -195,11 +158,8 @@ public class LocalServiceTest {
         nuevosDatos.setDireccion("Direccion Nueva");
         nuevosDatos.setComuna(comuna);
 
-        when(localRepository.findById(id))
-                .thenReturn(Optional.of(existente));
-
-        when(localRepository.save(any(Local.class)))
-                .thenReturn(existente);
+        when(localRepository.findById(id)).thenReturn(Optional.of(existente));
+        when(localRepository.save(any(Local.class))).thenAnswer(inv -> inv.getArgument(0));
 
         LocalDTO resultado = localService.actualizarLocal(id, nuevosDatos);
 
@@ -207,7 +167,7 @@ public class LocalServiceTest {
         assertEquals("Sucursal Nueva", resultado.getNombreLocal());
         assertEquals("Direccion Nueva", resultado.getDireccion());
 
-        verify(localRepository).findById(id);
-        verify(localRepository).save(any(Local.class));
-     }
+        verify(localRepository, times(1)).findById(id);
+        verify(localRepository, times(1)).save(any(Local.class));
+    }
 }
